@@ -1,0 +1,155 @@
+[
+  {
+    "id": "T-0001",
+    "subject": "Webhook notifications stopped working",
+    "body": "Our webhooks stopped receiving notifications yesterday around 3pm EST. We haven't changed our endpoint configuration. Can you check if there's an issue on your end?",
+    "customer_name": "Mike Taylor",
+    "customer_email": "user1@example.com",
+    "created_at": "2026-01-06T14:20:00Z",
+    "source": "jira"
+  },
+  {
+    "id": "T-0002",
+    "subject": "API rate limits too restrictive",
+    "body": "We're building an integration with your API but keep hitting rate limits (100 req/min). For our use case, we need at least 500 req/min.\n\nIs there an enterprise plan or way to increase our limits? We're willing to pay more.",
+    "customer_name": "Paula Anderson",
+    "customer_email": "user2@example.com",
+    "created_at": "2026-01-06T10:12:00Z",
+    "source": "jira"
+  },
+  {
+    "id": "T-0003",
+    "subject": "Slow dashboard load times",
+    "body": "The dashboard is taking 20-30 seconds to load for the past week. It used to load instantly. Is there a performance issue? We have about 50,000 records in our account.",
+    "customer_name": "Diana Lee",
+    "customer_email": "user3@example.com",
+    "created_at": "2026-01-07T17:40:00Z",
+    "source": "intercom"
+  },
+  {
+    "id": "T-0004",
+    "subject": "SSO setup help needed",
+    "body": "We're trying to set up SAML SSO with Okta but getting 'invalid assertion' errors. We followed the documentation exactly. Can someone from your team help troubleshoot this?",
+    "customer_name": "Julia Wilson",
+    "customer_email": "user4@example.com",
+    "created_at": "2026-01-07T16:07:00Z",
+    "source": "jira"
+  },
+  {
+    "id": "T-0005",
+    "subject": "URGENT: Production database is down!!!",
+    "body": "EMERGENCY - Our entire production database cluster is completely unresponsive. All customer-facing requests are failing with 503 errors. This is affecting 100% of our users.\n\nWe need IMMEDIATE assistance. This is a P0 incident. Please escalate to your on-call engineering team right away.",
+    "customer_name": "Greg Thompson",
+    "customer_email": "user5@example.com",
+    "created_at": "2026-01-07T15:15:00Z",
+    "source": "zendesk"
+  },
+  {
+    "id": "T-0006",
+    "subject": "Security concern - potential XSS vulnerability",
+    "body": "Hi security team,\n\nI believe I've found a potential XSS vulnerability in your user profile page. When users enter certain characters in the bio field, they're not properly escaped.\n\nI'm a security researcher and would like to report this responsibly. Please let me know the best way to share technical details.",
+    "customer_name": "Kevin Brown",
+    "customer_email": "user6@example.com",
+    "created_at": "2026-01-07T12:44:00Z",
+    "source": "intercom"
+  },
+  {
+    "id": "T-0007",
+    "subject": "Security concern - potential XSS vulnerability",
+    "body": "Hi security team,\n\nI believe I've found a potential XSS vulnerability in your user profile page. When users enter certain characters in the bio field, they're not properly escaped.\n\nI'm a security researcher and would like to report this responsibly. Please let me know the best way to share technical details.",
+    "customer_name": "Greg Thompson",
+    "customer_email": "user7@example.com",
+    "created_at": "2026-01-08T12:55:00Z",
+    "source": "email"
+  },
+  {
+    "id": "T-0008",
+    "subject": "Mobile app crashes on startup",
+    "body": "The iOS app crashes immediately when I open it. I've tried reinstalling but same issue. iPhone 14 Pro, iOS 17.2. This started after the latest update yesterday.",
+    "customer_name": "Mike Taylor",
+    "customer_email": "user8@example.com",
+    "created_at": "2026-01-08T10:23:00Z",
+    "source": "email"
+  },
+  {
+    "id": "T-0009",
+    "subject": "Enterprise pricing inquiry",
+    "body": "We're interested in upgrading to Enterprise for our 500-person team. What's the pricing and what additional features do we get? Can we schedule a call to discuss our requirements?",
+    "customer_name": "Ian Martinez",
+    "customer_email": "user9@example.com",
+    "created_at": "2026-01-09T11:54:00Z",
+    "source": "email"
+  },
+  {
+    "id": "T-0010",
+    "subject": "Webhook notifications stopped working",
+    "body": "Our webhooks stopped receiving notifications yesterday around 3pm EST. We haven't changed our endpoint configuration. Can you check if there's an issue on your end?",
+    "customer_name": "Steve Wilson",
+    "customer_email": "user10@example.com",
+    "created_at": "2026-01-09T11:39:00Z",
+    "source": "intercom"
+  },
+  {
+    "id": "T-0011",
+    "subject": "URGENT: Production database is down!!!",
+    "body": "EMERGENCY - Our entire production database cluster is completely unresponsive. All customer-facing requests are failing with 503 errors. This is affecting 100% of our users.\n\nWe need IMMEDIATE assistance. This is a P0 incident. Please escalate to your on-call engineering team right away.",
+    "customer_name": "Diana Lee",
+    "customer_email": "user11@example.com",
+    "created_at": "2026-01-09T15:52:00Z",
+    "source": "zendesk"
+  },
+  {
+    "id": "T-0012",
+    "subject": "URGENT: Production database is down!!!",
+    "body": "EMERGENCY - Our entire production database cluster is completely unresponsive. All customer-facing requests are failing with 503 errors. This is affecting 100% of our users.\n\nWe need IMMEDIATE assistance. This is a P0 incident. Please escalate to your on-call engineering team right away.",
+    "customer_name": "Nina Schmidt",
+    "customer_email": "user12@example.com",
+    "created_at": "2026-01-10T15:55:00Z",
+    "source": "jira"
+  },
+  {
+    "id": "T-0013",
+    "subject": "Mobile app crashes on startup",
+    "body": "The iOS app crashes immediately when I open it. I've tried reinstalling but same issue. iPhone 14 Pro, iOS 17.2. This started after the latest update yesterday.",
+    "customer_name": "Fiona Chen",
+    "customer_email": "user13@example.com",
+    "created_at": "2026-01-10T16:45:00Z",
+    "source": "jira"
+  },
+  {
+    "id": "T-0014",
+    "subject": "SSO setup help needed",
+    "body": "We're trying to set up SAML SSO with Okta but getting 'invalid assertion' errors. We followed the documentation exactly. Can someone from your team help troubleshoot this?",
+    "customer_name": "Diana Lee",
+    "customer_email": "user14@example.com",
+    "created_at": "2026-01-12T12:29:00Z",
+    "source": "email"
+  },
+  {
+    "id": "T-0015",
+    "subject": "Webhook notifications stopped working",
+    "body": "Our webhooks stopped receiving notifications yesterday around 3pm EST. We haven't changed our endpoint configuration. Can you check if there's an issue on your end?",
+    "customer_name": "Nina Schmidt",
+    "customer_email": "user15@example.com",
+    "created_at": "2026-01-12T15:37:00Z",
+    "source": "zendesk"
+  },
+  {
+    "id": "T-0016",
+    "subject": "Can't access shared workspace",
+    "body": "My colleague shared a workspace with me last week but I still can't see it in my workspace list. I've tried logging out and back in, clearing cache, different browsers - nothing works.\n\nCan you check permissions on your end?",
+    "customer_name": "Ethan Davis",
+    "customer_email": "user16@example.com",
+    "created_at": "2026-01-13T15:57:00Z",
+    "source": "intercom"
+  },
+  {
+    "id": "T-0017",
+    "subject": "How do I export my data?",
+    "body": "Hi, I need to export all my project data to CSV for a quarterly report. I looked through the documentation but couldn't find clear instructions. Could you walk me through the steps?",
+    "customer_name": "Nina Schmidt",
+    "customer_email": "user17@example.com",
+    "created_at": "2026-01-13T15:31:00Z",
+    "source": "jira"
+  }
+]

@@ -1,0 +1,7 @@
+# Dagster project configuration
+
+directory_type = "project"
+
+[project]
+root_module = "defs"
+defs_module = "defs"

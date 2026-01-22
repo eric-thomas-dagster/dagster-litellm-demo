@@ -1,0 +1,177 @@
+"""Example: Production-ready Definitions with all LiteLLM features enabled.
+
+This demonstrates how to configure LiteLLM for production use with:
+- Multi-provider router for 99.99% uptime
+- Caching for 50-90% cost savings
+- Observability with Langfuse
+- Budget management
+- Model escalation
+"""
+
+from pathlib import Path
+
+import dagster as dg
+
+from defs.resources import LiteLLMResource
+
+# Get the project root (where dg.toml is located)
+project_root = Path(__file__).parent.parent
+
+
+# ===== Production Configuration Examples =====
+
+
+def get_production_litellm_resource() -> LiteLLMResource:
+    """
+    Production-ready LiteLLM configuration with all features.
+
+    This configuration provides:
+    1. Multi-provider fallbacks (OpenAI → Anthropic → Azure)
+    2. Caching for cost savings
+    3. Observability with Langfuse
+    4. Budget management
+    5. Model escalation ladder
+    """
+    return LiteLLMResource(
+        # === Basic Settings ===
+        default_model="gpt-4o-mini",
+        timeout_s=60.0,
+        max_retries=3,
+
+        # === Model Escalation ===
+        # Try cheap model first, escalate to better models on validation failure
+        escalate_models=["gpt-4o", "claude-3-5-sonnet-20241022"],
+
+        # === Multi-Provider Router (99.99% uptime) ===
+        # Automatically switches providers on outage or rate limits
+        enable_router=True,
+        router_model_list=[
+            {
+                "model_name": "gpt-4o-mini",
+                "litellm_params": {
+                    "model": "gpt-4o-mini",
+                    "api_key": dg.EnvVar("OPENAI_API_KEY"),
+                },
+            },
+            {
+                "model_name": "gpt-4o-mini",
+                "litellm_params": {
+                    "model": "azure/gpt-4o-mini",
+                    "api_key": dg.EnvVar("AZURE_API_KEY"),
+                    "api_base": dg.EnvVar("AZURE_API_BASE"),
+                },
+            },
+            {
+                "model_name": "claude-haiku",
+                "litellm_params": {
+                    "model": "claude-3-5-haiku-20241022",
+                    "api_key": dg.EnvVar("ANTHROPIC_API_KEY"),
+                },
+            },
+        ],
+        router_fallback_models=["claude-haiku"],  # Fallback to Anthropic if OpenAI down
+        router_strategy="latency-based-routing",  # Route to fastest provider
+
+        # === Caching (50-90% cost savings) ===
+        # Cache repeated queries to avoid redundant API calls
+        enable_cache=True,
+        cache_type="redis",  # or "in-memory" for dev
+        cache_ttl=3600,  # 1 hour
+        redis_host=dg.EnvVar("REDIS_HOST").get_value("localhost"),
+        redis_port=6379,
+        redis_password=dg.EnvVar("REDIS_PASSWORD").get_value(None),
+
+        # === Observability (Langfuse) ===
+        # Track all LLM calls, costs, latencies in Langfuse
+        enable_callbacks=True,
+        langfuse_public_key=dg.EnvVar("LANGFUSE_PUBLIC_KEY").get_value(None),
+        langfuse_secret_key=dg.EnvVar("LANGFUSE_SECRET_KEY").get_value(None),
+        langfuse_host=dg.EnvVar("LANGFUSE_HOST").get_value("https://cloud.langfuse.com"),
+
+        # === Budget Management ===
+        # Prevent runaway costs
+        enable_budget=True,
+        max_budget_usd=100.0,  # Max $100/day
+        budget_duration="1d",
+    )
+
+
+def get_dev_litellm_resource() -> LiteLLMResource:
+    """Development configuration: simple and fast."""
+    return LiteLLMResource(
+        default_model=dg.EnvVar("LITELLM_DEFAULT_MODEL").get_value("gpt-4o-mini"),
+        timeout_s=60.0,
+        max_retries=3,
+        # Optionally enable caching for dev to save on API costs
+        enable_cache=True,
+        cache_type="in-memory",
+    )
+
+
+def get_staging_litellm_resource() -> LiteLLMResource:
+    """Staging configuration: production-like with lower budgets."""
+    return LiteLLMResource(
+        default_model="gpt-4o-mini",
+        escalate_models=["gpt-4o"],
+        enable_cache=True,
+        cache_type="redis",
+        redis_host=dg.EnvVar("REDIS_HOST").get_value("localhost"),
+        enable_callbacks=True,
+        langfuse_public_key=dg.EnvVar("LANGFUSE_PUBLIC_KEY").get_value(None),
+        langfuse_secret_key=dg.EnvVar("LANGFUSE_SECRET_KEY").get_value(None),
+        enable_budget=True,
+        max_budget_usd=20.0,  # Lower budget for staging
+    )
+
+
+# ===== Choose configuration based on environment =====
+
+ENVIRONMENT = dg.EnvVar("DAGSTER_ENVIRONMENT").get_value("dev")
+
+if ENVIRONMENT == "production":
+    litellm_resource = get_production_litellm_resource()
+elif ENVIRONMENT == "staging":
+    litellm_resource = get_staging_litellm_resource()
+else:
+    litellm_resource = get_dev_litellm_resource()
+
+
+# ===== Create Definitions =====
+
+defs = dg.Definitions.merge(
+    dg.load_from_defs_folder(project_root=project_root),
+    dg.Definitions(
+        resources={
+            "litellm": litellm_resource,
+        }
+    ),
+)
+
+
+# ===== How to Use =====
+"""
+1. Development (local):
+   export DAGSTER_ENVIRONMENT=dev
+   export OPENAI_API_KEY=sk-...
+   dg dev
+
+2. Staging:
+   export DAGSTER_ENVIRONMENT=staging
+   export OPENAI_API_KEY=sk-...
+   export REDIS_HOST=staging-redis.example.com
+   export LANGFUSE_PUBLIC_KEY=pk-...
+   export LANGFUSE_SECRET_KEY=sk-...
+   dg dev
+
+3. Production:
+   export DAGSTER_ENVIRONMENT=production
+   export OPENAI_API_KEY=sk-...
+   export AZURE_API_KEY=...
+   export AZURE_API_BASE=https://...
+   export ANTHROPIC_API_KEY=sk-ant-...
+   export REDIS_HOST=prod-redis.example.com
+   export REDIS_PASSWORD=...
+   export LANGFUSE_PUBLIC_KEY=pk-...
+   export LANGFUSE_SECRET_KEY=sk-...
+   dg dev
+"""
