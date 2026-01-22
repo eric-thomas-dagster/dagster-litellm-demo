@@ -34,10 +34,11 @@ This demo explores production patterns for LLM applications, showing how to buil
 - **Cost attribution** *(always on)* - Track spending per asset, per run to identify hot spots
 
 **Observability:**
-- **Full LLM tracking** *(always on)* - Every request logs tokens, cost, latency, and model used
+- **Dagster metadata tracking** *(always on)* - Every asset logs tokens, cost, latency, confidence scores, and model used
 - **Visual lineage** *(always on)* - See your entire pipeline at a glance in Dagster UI
-- **Metadata capture** *(always on)* - Rich metadata on every asset materialization
-- **Advanced tracking** *(configurable)* - Langfuse, W&B integration available (requires configuration)
+- **Asset checks** *(always on)* - Monitor quality gates (confidence thresholds, PII detection, escalation rates)
+- **Dagster+ alerting** *(available)* - Alert on asset failures, check failures, or custom metadata thresholds
+- **External integrations** *(configurable)* - Langfuse, W&B for LLM-specific deep dives (optional)
 
 **Scale:**
 - **Daily partitions** - Process millions of tickets efficiently by breaking work into daily chunks
@@ -60,7 +61,7 @@ But LiteLLM is much more than a wrapper:
 
 1. **Multi-Provider Router with Fallbacks** - If OpenAI goes down, automatically route to Anthropic. No downtime.
 2. **Model Escalation** - Try cheap models first, escalate to better models on validation failures. Significant cost savings.
-3. **Built-in Observability** - Integrated with Langfuse, W&B, Helicone, DataDog. Track every token, every latency spike.
+3. **Rich Metadata Capture** - Every request returns tokens, cost, latency, and model used. Logs directly to Dagster for tracking.
 4. **Intelligent Caching** - Cache identical requests. Reduce costs on repeated queries.
 5. **Battle-tested** - Used by hundreds of companies at scale.
 
@@ -119,7 +120,7 @@ See [DATA_GENERATION.md](DATA_GENERATION.md) for full CLI options and examples.
 3. **Multi-Provider Fallbacks** ⚙️ *Configurable* - Improve reliability with automatic provider switching (see Configuration section)
 4. **Smart Actions** ✅ *Active* - Smart routing: auto-reply high confidence tickets, manual review for failures
 5. **Caching** ⚙️ *Configurable* - Cost savings on repeated queries (see Configuration section)
-6. **Observability** ⚙️ *Configurable* - Full tracking with Langfuse (see Configuration section)
+6. **Observability** ✅ *Active* - Rich metadata logged to Dagster on every run (tokens, cost, latency, confidence)
 7. **Schedules & Jobs** ✅ *Active* - Daily automated processing at 9am
 
 ### 🔄 Standard Pipeline
@@ -174,9 +175,9 @@ LiteLLMResource(
     default_model="gpt-4o-mini",
     enable_cache=True,           # Cost savings on repeated queries
     enable_router=True,           # Multi-provider fallbacks
-    enable_callbacks=True,        # Langfuse observability
     enable_budget=True,           # Cost control
     escalate_models=["gpt-4o"],  # Model escalation
+    # Note: Rich metadata (tokens, cost, latency) logged to Dagster automatically!
 )
 ```
 
@@ -191,7 +192,7 @@ LiteLLMResource(
 ### Advanced Features (Optional)
 
 - **Caching**: Redis (persists across runs) or in-memory (single run only)
-- **Callbacks**: Langfuse, W&B
+- **External observability**: Langfuse, W&B for LLM-specific deep dives (optional - Dagster already tracks metadata)
 - **Function calling**: Agentic workflows
 - **Embeddings**: Semantic search
 - **Router**: Load balancing with fallbacks
@@ -271,10 +272,10 @@ The demo works out of the box with:
 
 ### Optional Features (Require Configuration)
 
-To enable multi-provider fallbacks, caching, or observability, update `definitions.py`:
+To enable multi-provider fallbacks or caching, update `definitions.py`:
 
 ```python
-# Example: Enable multi-provider fallbacks
+# Example: Enable multi-provider fallbacks and caching
 litellm_resource = LiteLLMResource(
     default_model="gpt-4o-mini",
     escalate_models=["gpt-4o"],  # Model escalation (active by default)
@@ -292,12 +293,17 @@ litellm_resource = LiteLLMResource(
     cache_type="redis",  # "redis" persists across runs, "in-memory" only within a single run
     redis_host=dg.EnvVar("REDIS_HOST"),
     redis_password=dg.EnvVar("REDIS_PASSWORD"),
+)
+```
 
-    # Optional: Enable observability
+**Note**: Observability is built-in! All assets already log rich metadata (tokens, cost, latency, confidence) to Dagster. View this in the Dagster UI on every asset run. Dagster+ adds alerting on failures, check failures, and custom metadata thresholds.
+
+**Optional**: For LLM-specific deep dives, you can enable Langfuse or W&B:
+```python
+    # Optional: External LLM observability (in addition to Dagster's built-in tracking)
     enable_callbacks=True,
     langfuse_public_key=dg.EnvVar("LANGFUSE_PUBLIC_KEY"),
     langfuse_secret_key=dg.EnvVar("LANGFUSE_SECRET_KEY"),
-)
 ```
 
 ### Environment Variables
@@ -321,7 +327,8 @@ AZURE_API_BASE=https://...
 REDIS_HOST=localhost
 REDIS_PASSWORD=...
 
-# Optional - Observability (requires enable_callbacks=True in code)
+# Optional - External LLM observability (Langfuse, W&B - requires enable_callbacks=True in code)
+# Note: Dagster already tracks all metadata! These are optional for LLM-specific deep dives.
 LANGFUSE_PUBLIC_KEY=pk-...
 LANGFUSE_SECRET_KEY=sk-...
 ```
@@ -572,15 +579,15 @@ This project uses `dagster dev -m defs.definitions`. If you prefer `dagster dev 
 - ✅ Multi-provider fallbacks - Improve reliability by automatically routing to backup providers during outages
 - ✅ Model escalation - Reduce costs by trying cheap models first, escalating only when needed
 - ✅ Intelligent caching - Reduce costs by caching identical requests (Redis or in-memory)
-- ✅ Built-in observability - Integrated with Langfuse, W&B, Helicone, DataDog for tracking every token and cost
+- ✅ Rich metadata - Returns tokens, cost, latency on every request for Dagster tracking
 - ✅ Battle-tested - Used by hundreds of companies at scale
 
 ### Dagster gives you:
 - ✅ Visual asset lineage - Understand your pipeline at a glance with interactive dependency graphs
-- ✅ Declarative pipelines - Define what to compute, not how to compute it
+- ✅ Rich metadata tracking - Every asset logs tokens, cost, latency, confidence scores - visible in UI
 - ✅ Asset checks - Enforce quality gates before downstream actions (confidence thresholds, PII detection, etc.)
+- ✅ Alerting (Dagster+) - Alert on asset failures, check failures, or custom metadata thresholds via Slack/PagerDuty
 - ✅ Partitioning - Process data incrementally (millions of tickets by day) with backfill support
-- ✅ Monitoring & alerting - Track pipeline health, set up Slack/PagerDuty alerts on failures
 - ✅ Cost attribution - Track spending per asset, per run to identify hot spots
 - ✅ Replay on changes - Reprocess historical data when code or models change
 
@@ -601,11 +608,12 @@ This project uses `dagster dev -m defs.definitions`. If you prefer `dagster dev 
 ## Next Steps
 
 1. **Try the demo**: `./start.sh` and materialize assets
-2. **Enable partitions**: Materialize `tickets_partitioned` for a specific day
-3. **Add router**: Configure multi-provider fallbacks
-4. **Integrate Jira/Slack**: Add real action implementations
-5. **Enable Langfuse**: Track costs and performance
-6. **Scale up**: Process production data with daily partitions
+2. **View metadata**: Check the Dagster UI to see tokens, costs, latency, and confidence scores logged on each asset
+3. **Enable partitions**: Materialize `tickets_partitioned` for a specific day
+4. **Add router**: Configure multi-provider fallbacks for improved reliability
+5. **Integrate Jira/Slack**: Add real action implementations
+6. **Set up alerts (Dagster+)**: Alert on asset failures or custom metadata thresholds
+7. **Scale up**: Process larger datasets with daily partitions
 
 ## FAQ
 
