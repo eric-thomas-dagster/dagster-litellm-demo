@@ -24,13 +24,13 @@ This demo explores production patterns for LLM applications, showing how to buil
 ### What This Demo Highlights
 
 **Resilience:**
-- **Multi-provider fallbacks** *(configurable)* - 99.99% uptime by automatically switching between OpenAI, Anthropic, and other providers when outages occur
+- **Multi-provider fallbacks** *(configurable)* - Improve reliability by automatically switching between OpenAI, Anthropic, and other providers when outages occur
 - **Model escalation** *(active by default)* - Start with cheap models (gpt-4o-mini: $0.15/1M tokens), automatically escalate to better models (gpt-4o: $2.50/1M tokens) only when confidence is low
 - **Quality gates** *(active by default)* - Asset checks enforce business rules before taking actions (confidence thresholds, PII detection, reply quality)
 
 **Cost Optimization:**
-- **Model escalation** *(active by default)* - 80%+ cost savings by using cheap models first, escalating only when needed
-- **Intelligent caching** *(configurable)* - 50-90% cost reduction by caching identical requests (requires configuration)
+- **Model escalation** *(active by default)* - Significant cost savings by using cheap models first, escalating only when needed
+- **Intelligent caching** *(configurable)* - Reduce costs by caching identical requests (requires configuration)
 - **Cost attribution** *(always on)* - Track spending per asset, per run to identify hot spots
 
 **Observability:**
@@ -59,9 +59,9 @@ response = litellm.completion(
 But LiteLLM is much more than a wrapper:
 
 1. **Multi-Provider Router with Fallbacks** - If OpenAI goes down, automatically route to Anthropic. No downtime.
-2. **Model Escalation** - Try cheap models first, escalate to better models on validation failures. Save 80% on costs.
+2. **Model Escalation** - Try cheap models first, escalate to better models on validation failures. Significant cost savings.
 3. **Built-in Observability** - Integrated with Langfuse, W&B, Helicone, DataDog. Track every token, every latency spike.
-4. **Intelligent Caching** - Cache identical requests. Reduce costs by 60-90% in production.
+4. **Intelligent Caching** - Cache identical requests. Reduce costs on repeated queries.
 5. **Battle-tested** - Used by hundreds of companies at scale.
 
 ### Why Dagster?
@@ -116,9 +116,9 @@ See [DATA_GENERATION.md](DATA_GENERATION.md) for full CLI options and examples.
 
 1. **Daily Partitioned Assets** ✅ *Active* - Process millions of tickets by day with backfills
 2. **Model Escalation + Quality Gates** ✅ *Active* - Try cheap models first, auto-escalate on low confidence, route failures to manual review
-3. **Multi-Provider Fallbacks** ⚙️ *Configurable* - 99.99% uptime with automatic provider switching (see Configuration section)
+3. **Multi-Provider Fallbacks** ⚙️ *Configurable* - Improve reliability with automatic provider switching (see Configuration section)
 4. **Smart Actions** ✅ *Active* - Smart routing: auto-reply high confidence tickets, manual review for failures
-5. **Caching** ⚙️ *Configurable* - 50-90% cost savings on repeated queries (see Configuration section)
+5. **Caching** ⚙️ *Configurable* - Cost savings on repeated queries (see Configuration section)
 6. **Observability** ⚙️ *Configurable* - Full tracking with Langfuse (see Configuration section)
 7. **Schedules & Jobs** ✅ *Active* - Daily automated processing at 9am
 
@@ -172,7 +172,7 @@ LiteLLMResource(default_model="gpt-4o-mini")
 # Add features as needed
 LiteLLMResource(
     default_model="gpt-4o-mini",
-    enable_cache=True,           # 50-90% cost savings
+    enable_cache=True,           # Cost savings on repeated queries
     enable_router=True,           # Multi-provider fallbacks
     enable_callbacks=True,        # Langfuse observability
     enable_budget=True,           # Cost control
@@ -396,7 +396,7 @@ LITELLM_ESCALATE_MODELS=gpt-4o  # Fallback model
 - Slack #triage-review channel notification
 - Human agent assignment
 
-**Cost savings**: 90% of tickets use cheap model, only 10% escalate
+**Cost savings**: Most tickets use the cheap model, only low-confidence tickets escalate
 
 ### 2. Daily Partitions for Scale
 
@@ -423,7 +423,7 @@ def tickets_partitioned(context):
 
 ### 3. Multi-Provider Fallbacks (Router)
 
-Achieve 99.99% uptime with automatic provider switching:
+Improve uptime with automatic provider switching:
 
 ```python
 LiteLLMResource(
@@ -471,7 +471,7 @@ def actions_production(context, triage, jira: JIRA, slack: WebClient):
 
 ### 5. Caching for Cost Savings
 
-50-90% cost reduction on repeated queries:
+Reduce costs by avoiding redundant API calls on repeated queries:
 
 ```python
 LiteLLMResource(
@@ -569,9 +569,9 @@ This project uses `dagster dev -m defs.definitions`. If you prefer `dagster dev 
 
 ### LiteLLM gives you:
 - ✅ 100+ LLM providers with one API - Switch between OpenAI, Anthropic, Gemini, Azure, AWS Bedrock without code changes
-- ✅ Multi-provider fallbacks - 99.99% uptime by automatically routing to backup providers during outages
-- ✅ Model escalation - 80% cost savings by trying cheap models first, escalating only when needed
-- ✅ Intelligent caching - 60-90% cost reduction by caching identical requests (Redis or in-memory)
+- ✅ Multi-provider fallbacks - Improve reliability by automatically routing to backup providers during outages
+- ✅ Model escalation - Reduce costs by trying cheap models first, escalating only when needed
+- ✅ Intelligent caching - Reduce costs by caching identical requests (Redis or in-memory)
 - ✅ Built-in observability - Integrated with Langfuse, W&B, Helicone, DataDog for tracking every token and cost
 - ✅ Battle-tested - Used by hundreds of companies at scale
 
@@ -646,10 +646,10 @@ Or use **Backfill** to process multiple days at once (e.g., process last 30 days
 
 **Recommended**: Use partitioned assets to process one day at a time, keeping costs minimal.
 
-In production with 10K tickets/day:
-- With caching (60% hit rate): ~$6/day
-- With model escalation: ~$8/day
-- Without optimization: ~$20/day
+At larger scale (10K tickets/day):
+- With caching: Lower cost due to cache hits on similar queries
+- With model escalation: Lower cost from using cheap models when appropriate
+- Without optimizations: Higher baseline cost
 
 ### What's the difference between this and Dagster+?
 
