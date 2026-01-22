@@ -149,7 +149,6 @@ tickets_partitioned → triage_with_fallbacks → actions_production
 
 ### 📚 Enhanced Examples
 
-- `streaming_story` - Streaming responses
 - `cached_summaries` - Caching demonstration
 - `document_embeddings` → `semantic_search` - Embeddings & RAG
 - `agentic_tool_use` → `multi_step_agent` - Function calling
@@ -193,7 +192,6 @@ LiteLLMResource(
 
 - **Caching**: Redis (persists across runs) or in-memory (single run only)
 - **Callbacks**: Langfuse, W&B
-- **Streaming**: Real-time responses
 - **Function calling**: Agentic workflows
 - **Embeddings**: Semantic search
 - **Router**: Load balancing with fallbacks
