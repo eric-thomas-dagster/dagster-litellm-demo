@@ -24,19 +24,20 @@ This demo explores production patterns for LLM applications, showing how to buil
 ### What This Demo Highlights
 
 **Production Resilience:**
-- **Multi-provider fallbacks** - 99.99% uptime by automatically switching between OpenAI, Anthropic, and other providers when outages occur
-- **Model escalation** - Start with cheap models (gpt-4o-mini: $0.15/1M tokens), automatically escalate to better models (gpt-4o: $2.50/1M tokens) only when confidence is low
-- **Quality gates** - Asset checks enforce business rules before taking actions (confidence thresholds, PII detection, reply quality)
+- **Multi-provider fallbacks** *(configurable)* - 99.99% uptime by automatically switching between OpenAI, Anthropic, and other providers when outages occur
+- **Model escalation** *(active by default)* - Start with cheap models (gpt-4o-mini: $0.15/1M tokens), automatically escalate to better models (gpt-4o: $2.50/1M tokens) only when confidence is low
+- **Quality gates** *(active by default)* - Asset checks enforce business rules before taking actions (confidence thresholds, PII detection, reply quality)
 
 **Cost Optimization:**
-- **Intelligent caching** - 50-90% cost reduction by caching identical requests
-- **Model escalation** - 80%+ cost savings by using cheap models first, escalating only when needed
-- **Cost attribution** - Track spending per asset, per run to identify hot spots
+- **Model escalation** *(active by default)* - 80%+ cost savings by using cheap models first, escalating only when needed
+- **Intelligent caching** *(configurable)* - 50-90% cost reduction by caching identical requests (requires configuration)
+- **Cost attribution** *(always on)* - Track spending per asset, per run to identify hot spots
 
 **Observability:**
-- **Full LLM tracking** - Every request logs tokens, cost, latency, and model used
-- **Visual lineage** - See your entire pipeline at a glance
-- **Metadata capture** - Rich metadata on every asset materialization
+- **Full LLM tracking** *(always on)* - Every request logs tokens, cost, latency, and model used
+- **Visual lineage** *(always on)* - See your entire pipeline at a glance in Dagster UI
+- **Metadata capture** *(always on)* - Rich metadata on every asset materialization
+- **Advanced tracking** *(configurable)* - Langfuse, W&B integration available (requires configuration)
 
 **Scale:**
 - **Daily partitions** - Process millions of tickets efficiently by breaking work into daily chunks
@@ -113,13 +114,13 @@ See [DATA_GENERATION.md](DATA_GENERATION.md) for full CLI options and examples.
 
 ### ✅ Production Features
 
-1. **Daily Partitioned Assets** - Process millions of tickets by day with backfills
-2. **Model Escalation + Quality Gates** - Try cheap models first, auto-escalate on low confidence, route failures to manual review
-3. **Multi-Provider Fallbacks** - 99.99% uptime with automatic provider switching
-4. **Production Actions** - Smart routing: auto-reply high confidence tickets, manual review for failures
-5. **Caching** - 50-90% cost savings on repeated queries
-6. **Observability** - Full tracking with Langfuse
-7. **Schedules & Jobs** - Daily automated processing at 9am
+1. **Daily Partitioned Assets** ✅ *Active* - Process millions of tickets by day with backfills
+2. **Model Escalation + Quality Gates** ✅ *Active* - Try cheap models first, auto-escalate on low confidence, route failures to manual review
+3. **Multi-Provider Fallbacks** ⚙️ *Configurable* - 99.99% uptime with automatic provider switching (see Configuration section)
+4. **Production Actions** ✅ *Active* - Smart routing: auto-reply high confidence tickets, manual review for failures
+5. **Caching** ⚙️ *Configurable* - 50-90% cost savings on repeated queries (see Configuration section)
+6. **Observability** ⚙️ *Configurable* - Full tracking with Langfuse (see Configuration section)
+7. **Schedules & Jobs** ✅ *Active* - Daily automated processing at 9am
 
 ### 🔄 Standard Pipeline
 
@@ -262,6 +263,44 @@ def tickets_daily(context):
 
 ## Configuration
 
+### What's Active by Default
+
+The demo works out of the box with:
+- ✅ **Model escalation** - Set `LITELLM_ESCALATE_MODELS=gpt-4o` to enable (tries cheap model first, escalates if confidence < 0.75)
+- ✅ **Quality gates** - 5 asset checks monitor confidence, PII, reply quality, escalation rate, and token usage
+- ✅ **Daily partitions** - Process tickets day-by-day for scale
+- ✅ **Production actions** - Smart routing based on confidence and priority
+
+### Optional Features (Require Configuration)
+
+To enable multi-provider fallbacks, caching, or observability, update `definitions.py`:
+
+```python
+# Example: Enable multi-provider fallbacks
+litellm_resource = LiteLLMResource(
+    default_model="gpt-4o-mini",
+    escalate_models=["gpt-4o"],  # Model escalation (active by default)
+
+    # Enable router for multi-provider fallbacks
+    enable_router=True,
+    router_model_list=[
+        {"model_name": "gpt-4o-mini", "litellm_params": {"model": "gpt-4o-mini"}},
+        {"model_name": "claude-haiku", "litellm_params": {"model": "claude-3-5-haiku-20241022"}},
+    ],
+    router_fallback_models=["claude-haiku"],
+
+    # Optional: Enable caching
+    enable_cache=True,
+    cache_type="redis",
+    redis_host=dg.EnvVar("REDIS_HOST"),
+
+    # Optional: Enable observability
+    enable_callbacks=True,
+    langfuse_public_key=dg.EnvVar("LANGFUSE_PUBLIC_KEY"),
+    langfuse_secret_key=dg.EnvVar("LANGFUSE_SECRET_KEY"),
+)
+```
+
 ### Environment Variables
 
 ```bash
@@ -270,22 +309,22 @@ OPENAI_API_KEY=sk-...
 # OR
 ANTHROPIC_API_KEY=sk-ant-...
 
-# Optional - Multi-provider fallbacks
+# Optional - Model escalation (active by default if set)
+LITELLM_ESCALATE_MODELS=gpt-4o,claude-3-5-sonnet-20241022
+
+# Optional - Multi-provider fallbacks (requires enable_router=True in code)
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
 AZURE_API_KEY=...
 AZURE_API_BASE=https://...
 
-# Optional - Caching
+# Optional - Caching (requires enable_cache=True in code)
 REDIS_HOST=localhost
 REDIS_PASSWORD=...
 
-# Optional - Observability
+# Optional - Observability (requires enable_callbacks=True in code)
 LANGFUSE_PUBLIC_KEY=pk-...
 LANGFUSE_SECRET_KEY=sk-...
-
-# Optional - Model escalation
-LITELLM_ESCALATE_MODELS=gpt-4o,claude-3-5-sonnet-20241022
 ```
 
 ### Dev vs Staging vs Prod
