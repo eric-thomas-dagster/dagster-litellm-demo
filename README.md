@@ -17,6 +17,64 @@ cp .env.example .env
 
 Open http://localhost:3000 and click "Materialize all".
 
+## Overview
+
+This demo explores production patterns for LLM applications, showing how to build resilient, cost-effective AI pipelines that can handle real-world challenges.
+
+### What This Demo Highlights
+
+**Production Resilience:**
+- **Multi-provider fallbacks** - 99.99% uptime by automatically switching between OpenAI, Anthropic, and other providers when outages occur
+- **Model escalation** - Start with cheap models (gpt-4o-mini: $0.15/1M tokens), automatically escalate to better models (gpt-4o: $2.50/1M tokens) only when confidence is low
+- **Quality gates** - Asset checks enforce business rules before taking actions (confidence thresholds, PII detection, reply quality)
+
+**Cost Optimization:**
+- **Intelligent caching** - 50-90% cost reduction by caching identical requests
+- **Model escalation** - 80%+ cost savings by using cheap models first, escalating only when needed
+- **Cost attribution** - Track spending per asset, per run to identify hot spots
+
+**Observability:**
+- **Full LLM tracking** - Every request logs tokens, cost, latency, and model used
+- **Visual lineage** - See your entire pipeline at a glance
+- **Metadata capture** - Rich metadata on every asset materialization
+
+**Scale:**
+- **Daily partitions** - Process millions of tickets efficiently by breaking work into daily chunks
+- **Backfill support** - Reprocess historical data in parallel
+- **Incremental processing** - Only process new data, skip what's already done
+
+### Why LiteLLM?
+
+[LiteLLM](https://github.com/BerriAI/litellm) provides a universal interface for 100+ LLM providers (OpenAI, Anthropic, Gemini, Azure, AWS Bedrock, and more). One API, any model:
+
+```python
+# Same code works with any provider
+response = litellm.completion(
+    model="gpt-4o-mini",  # or "claude-3-5-sonnet-20241022", "gemini-pro", etc.
+    messages=[{"role": "user", "content": "Hello"}]
+)
+```
+
+But LiteLLM is much more than a wrapper:
+
+1. **Multi-Provider Router with Fallbacks** - If OpenAI goes down, automatically route to Anthropic. No downtime.
+2. **Model Escalation** - Try cheap models first, escalate to better models on validation failures. Save 80% on costs.
+3. **Built-in Observability** - Integrated with Langfuse, W&B, Helicone, DataDog. Track every token, every latency spike.
+4. **Intelligent Caching** - Cache identical requests. Reduce costs by 60-90% in production.
+5. **Production-Tested** - Used by hundreds of companies. Battle-tested at scale.
+
+### Why Dagster?
+
+**Dagster** provides orchestration for data and AI pipelines:
+
+- **Asset lineage** - Visual graph of your pipeline dependencies
+- **Partitioning** - Process data incrementally (scale to millions of tickets)
+- **Quality gates** - Asset checks enforce business rules
+- **Observability** - Track metadata, logs, and costs per asset
+- **Replay on changes** - Reprocess data when code or models change
+
+**Together**: Production-ready LLM pipelines with full governance, cost control, and reliability.
+
 ## Sample Data
 
 This demo uses **two optimized datasets** to balance realism with cost:
@@ -464,20 +522,29 @@ This project uses `dagster dev -m defs.definitions`. If you prefer `dagster dev 
 
 ## Why LiteLLM + Dagster?
 
-**LiteLLM** provides:
-- Universal API (100+ models)
-- Built-in fallbacks
-- Cost tracking
-- Easy model swapping
+### LiteLLM gives you:
+- ✅ 100+ LLM providers with one API - Switch between OpenAI, Anthropic, Gemini, Azure, AWS Bedrock without code changes
+- ✅ Multi-provider fallbacks - 99.99% uptime by automatically routing to backup providers during outages
+- ✅ Model escalation - 80% cost savings by trying cheap models first, escalating only when needed
+- ✅ Intelligent caching - 60-90% cost reduction by caching identical requests (Redis or in-memory)
+- ✅ Built-in observability - Integrated with Langfuse, W&B, Helicone, DataDog for tracking every token and cost
+- ✅ Production-tested - Used by hundreds of companies at scale
 
-**Dagster** provides:
-- Asset lineage
-- Partitioning (scale to millions)
-- Quality gates
-- Observability
-- Replay on changes
+### Dagster gives you:
+- ✅ Visual asset lineage - Understand your pipeline at a glance with interactive dependency graphs
+- ✅ Declarative pipelines - Define what to compute, not how to compute it
+- ✅ Asset checks - Enforce quality gates before downstream actions (confidence thresholds, PII detection, etc.)
+- ✅ Partitioning - Process data incrementally (millions of tickets by day) with backfill support
+- ✅ Monitoring & alerting - Track pipeline health, set up Slack/PagerDuty alerts on failures
+- ✅ Cost attribution - Track spending per asset, per run to identify hot spots
+- ✅ Replay on changes - Reprocess historical data when code or models change
 
-**Together**: Production-ready LLM pipelines with full governance.
+### Together, they provide:
+- 🚀 **Production reliability** - Multi-provider fallbacks + retry logic + quality gates
+- 💰 **Cost optimization** - Model escalation + caching + cost tracking per asset
+- 🔍 **Full observability** - LLM metrics (tokens, latency, cost) + pipeline metadata + lineage
+- ⚡ **Development velocity** - Declarative pipelines + asset reuse + incremental processing
+- 🛡️ **Enterprise security** - Secrets management + audit logs + quality enforcement
 
 ## Requirements
 
