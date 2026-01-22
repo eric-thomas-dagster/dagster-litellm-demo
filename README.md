@@ -1,6 +1,6 @@
 # LiteLLM + Dagster Integration Demo
 
-Production-ready integration between [LiteLLM](https://github.com/BerriAI/litellm) and [Dagster](https://dagster.io) for building scalable LLM pipelines.
+Integration between [LiteLLM](https://github.com/BerriAI/litellm) and [Dagster](https://dagster.io) for building scalable LLM pipelines.
 
 **Uses modern Dagster structure** with `defs/` directory.
 
@@ -62,7 +62,7 @@ But LiteLLM is much more than a wrapper:
 2. **Model Escalation** - Try cheap models first, escalate to better models on validation failures. Save 80% on costs.
 3. **Built-in Observability** - Integrated with Langfuse, W&B, Helicone, DataDog. Track every token, every latency spike.
 4. **Intelligent Caching** - Cache identical requests. Reduce costs by 60-90% in production.
-5. **Production-Tested** - Used by hundreds of companies. Battle-tested at scale.
+5. **Battle-tested** - Used by hundreds of companies at scale.
 
 ### Why Dagster?
 
@@ -74,7 +74,7 @@ But LiteLLM is much more than a wrapper:
 - **Observability** - Track metadata, logs, and costs per asset
 - **Replay on changes** - Reprocess data when code or models change
 
-**Together**: Production-ready LLM pipelines with full governance, cost control, and reliability.
+**Together**: LLM pipelines with full governance, cost control, and reliability.
 
 ## Sample Data
 
@@ -144,7 +144,7 @@ tickets_partitioned → triage_with_fallbacks → actions_production
 - Daily partitions (982 tickets over 241 days)
 - Process one day at a time for scalability
 - Same escalation + quality gates as standard pipeline
-- Production-ready actions: Jira, Slack, auto-replies, manual review
+- Smart actions: Jira, Slack, auto-replies, manual review
 - Perfect for backfills and scheduled runs
 
 ### 📚 Enhanced Examples
@@ -567,7 +567,7 @@ This project uses `dagster dev -m defs.definitions`. If you prefer `dagster dev 
 - ✅ Model escalation - 80% cost savings by trying cheap models first, escalating only when needed
 - ✅ Intelligent caching - 60-90% cost reduction by caching identical requests (Redis or in-memory)
 - ✅ Built-in observability - Integrated with Langfuse, W&B, Helicone, DataDog for tracking every token and cost
-- ✅ Production-tested - Used by hundreds of companies at scale
+- ✅ Battle-tested - Used by hundreds of companies at scale
 
 ### Dagster gives you:
 - ✅ Visual asset lineage - Understand your pipeline at a glance with interactive dependency graphs
@@ -579,7 +579,7 @@ This project uses `dagster dev -m defs.definitions`. If you prefer `dagster dev 
 - ✅ Replay on changes - Reprocess historical data when code or models change
 
 ### Together, they provide:
-- 🚀 **Production reliability** - Multi-provider fallbacks + retry logic + quality gates
+- 🚀 **Reliability** - Multi-provider fallbacks + retry logic + quality gates
 - 💰 **Cost optimization** - Model escalation + caching + cost tracking per asset
 - 🔍 **Full observability** - LLM metrics (tokens, latency, cost) + pipeline metadata + lineage
 - ⚡ **Development velocity** - Declarative pipelines + asset reuse + incremental processing
