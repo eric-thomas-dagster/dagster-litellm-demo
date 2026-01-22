@@ -191,7 +191,7 @@ LiteLLMResource(
 
 ### Advanced Features (Optional)
 
-- **Caching**: Redis or in-memory
+- **Caching**: Redis (persists across runs) or in-memory (single run only)
 - **Callbacks**: Langfuse, W&B
 - **Streaming**: Real-time responses
 - **Function calling**: Agentic workflows
@@ -289,10 +289,11 @@ litellm_resource = LiteLLMResource(
     ],
     router_fallback_models=["claude-haiku"],
 
-    # Optional: Enable caching
+    # Optional: Enable caching (use Redis to persist across job runs)
     enable_cache=True,
-    cache_type="redis",
+    cache_type="redis",  # "redis" persists across runs, "in-memory" only within a single run
     redis_host=dg.EnvVar("REDIS_HOST"),
+    redis_password=dg.EnvVar("REDIS_PASSWORD"),
 
     # Optional: Enable observability
     enable_callbacks=True,
@@ -477,15 +478,22 @@ def actions_production(context, triage, jira: JIRA, slack: WebClient):
 ```python
 LiteLLMResource(
     enable_cache=True,
-    cache_type="redis",  # or "in-memory" for dev
+    cache_type="redis",  # Recommended for Dagster - persists across job runs
     redis_host=EnvVar("REDIS_HOST"),
+    redis_port=6379,
+    redis_password=EnvVar("REDIS_PASSWORD"),
 )
 ```
 
+**Cache types:**
+- **Redis** *(recommended)*: Persists across Dagster job runs. All jobs share the same cache. Essential for scheduled runs and backfills.
+- **In-memory**: Only lasts for a single job run. Useful for development or within-run deduplication, but cache is lost when the job completes.
+
 **Use cases**:
-- Development: Avoid burning API credits
-- Backfills: Reprocess without re-calling LLM
-- High traffic: Cache similar customer questions
+- Development: Avoid burning API credits during testing
+- Backfills: Reprocess without re-calling LLM for identical queries
+- High traffic: Cache similar customer questions across multiple runs
+- Scheduled runs: Benefit from cached results day over day
 
 ## Project Structure
 
