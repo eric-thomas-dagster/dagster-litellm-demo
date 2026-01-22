@@ -89,7 +89,7 @@ This demo uses **two optimized datasets** to balance realism with cost:
 ### 📦 Large Dataset (`tickets_large.json`)
 - **982 tickets** over 241 days (120 historical + 120 future)
 - **Used by**: Partitioned assets (`triage_with_fallbacks`, `tickets_partitioned`)
-- **Purpose**: Production simulation with daily partitions (~$0.001 per day)
+- **Purpose**: Scalable processing with daily partitions (~$0.001 per day)
 - **Perfect for**: Backfills, scheduled runs, scale testing
 - **Date range**: Sep 15, 2025 → May 13, 2026
 
@@ -112,12 +112,12 @@ See [DATA_GENERATION.md](DATA_GENERATION.md) for full CLI options and examples.
 
 ## What's Included
 
-### ✅ Production Features
+### ✅ Key Features
 
 1. **Daily Partitioned Assets** ✅ *Active* - Process millions of tickets by day with backfills
 2. **Model Escalation + Quality Gates** ✅ *Active* - Try cheap models first, auto-escalate on low confidence, route failures to manual review
 3. **Multi-Provider Fallbacks** ⚙️ *Configurable* - 99.99% uptime with automatic provider switching (see Configuration section)
-4. **Production Actions** ✅ *Active* - Smart routing: auto-reply high confidence tickets, manual review for failures
+4. **Smart Actions** ✅ *Active* - Smart routing: auto-reply high confidence tickets, manual review for failures
 5. **Caching** ⚙️ *Configurable* - 50-90% cost savings on repeated queries (see Configuration section)
 6. **Observability** ⚙️ *Configurable* - Full tracking with Langfuse (see Configuration section)
 7. **Schedules & Jobs** ✅ *Active* - Daily automated processing at 9am
@@ -134,7 +134,7 @@ tickets_raw → tickets_clean → triage_llm → triage_eval → triage_actions
 - Quality gates: confidence < 0.65, needs_human, PII, or poor reply quality
 - Smart actions: high confidence → auto-reply, failures → manual review queue
 
-### 📅 Partitioned Pipeline (Production)
+### 📅 Partitioned Pipeline (Scalable)
 
 ```
 tickets_partitioned → triage_with_fallbacks → actions_production
@@ -269,7 +269,7 @@ The demo works out of the box with:
 - ✅ **Model escalation** - Set `LITELLM_ESCALATE_MODELS=gpt-4o` to enable (tries cheap model first, escalates if confidence < 0.75)
 - ✅ **Quality gates** - 5 asset checks monitor confidence, PII, reply quality, escalation rate, and token usage
 - ✅ **Daily partitions** - Process tickets day-by-day for scale
-- ✅ **Production actions** - Smart routing based on confidence and priority
+- ✅ **Smart actions** - Smart routing based on confidence and priority
 
 ### Optional Features (Require Configuration)
 
@@ -363,14 +363,14 @@ dagster job execute -m defs.definitions -j partitioned_triage_pipeline \
 
 **1. `daily_triage_schedule`** - Runs every day at 9:00 AM
 - Processes yesterday's partition automatically
-- Perfect for production simulation
+- Perfect for scheduled processing
 
 **2. `weekly_full_triage`** - Runs every Monday at 10:00 AM
 - Processes full dataset (health check)
 
 **Enable in Dagster UI**: Schedules tab → Start schedule
 
-## Production Patterns
+## Advanced Patterns
 
 ### 1. Model Escalation + Quality Gates
 
@@ -442,7 +442,7 @@ LiteLLMResource(
 - Provider outage: Auto-switches to fallback
 - Rate limits: Distributes load across providers
 
-### 4. Production Actions
+### 4. Smart Actions
 
 Smart routing based on triage quality:
 
@@ -508,7 +508,7 @@ dagster_litellm_demo/
 │       ├── tickets.py      # Standard pipeline
 │       ├── triage.py
 │       ├── checks.py
-│       ├── partitioned_triage.py  # Production patterns
+│       ├── partitioned_triage.py  # Advanced patterns
 │       └── enhanced_examples.py
 ├── sample_data/
 │   ├── tickets_small.json  # Small dataset (non-partitioned)
