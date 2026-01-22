@@ -23,7 +23,7 @@ This demo explores production patterns for LLM applications, showing how to buil
 
 ### What This Demo Highlights
 
-**Production Resilience:**
+**Resilience:**
 - **Multi-provider fallbacks** *(configurable)* - 99.99% uptime by automatically switching between OpenAI, Anthropic, and other providers when outages occur
 - **Model escalation** *(active by default)* - Start with cheap models (gpt-4o-mini: $0.15/1M tokens), automatically escalate to better models (gpt-4o: $2.50/1M tokens) only when confidence is low
 - **Quality gates** *(active by default)* - Asset checks enforce business rules before taking actions (confidence thresholds, PII detection, reply quality)
